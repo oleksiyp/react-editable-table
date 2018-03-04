@@ -60,7 +60,7 @@ class EditableTable extends Component {
                     return <span> ⬇</span>
                 case 'desc':
                     return <span> ⬆</span>
-                case 'none':
+                default:
                     return <span> &nbsp;</span>
             }
         }
@@ -81,7 +81,7 @@ class EditableTable extends Component {
                 return 'desc'
             case 'desc':
                 return 'none'
-            case 'none':
+            default:
                 return 'asc'
         }
     }

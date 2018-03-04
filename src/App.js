@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
 import EditableTable from "./EditableTable";
 import ScrollableLoader from "./ScrollableLoader";
