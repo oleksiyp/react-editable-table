@@ -5,4 +5,5 @@ Run debug server http://localhost:3000/:
 yarn start
 ```
 
+Preview:
 ![table](table.png)
