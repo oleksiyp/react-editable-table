@@ -105,7 +105,7 @@ class App extends Component {
             <div className="App" style={{display: "flex", flexDirection: "column", height: "100%"}}>
                 <input type="text" placeholder="Search" value={this.state.qParams.filter} onChange={this.filterChanged}/>
                 <ScrollableLoader loadData={this.loadData} dataKey={this.state.qParams}>
-                    <EditableTable header={[
+                    <EditableTable multiline={true} header={[
                         {name: "Included", field: "included", edit: "checkbox"},
                         {name: "Name", field: "name"},
                         {name: "Size", field: "size", view: App.mapSize},
