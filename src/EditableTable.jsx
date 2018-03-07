@@ -48,17 +48,25 @@ class EditableTable extends Component {
         })
     }
 
-    startSelection(rowId, ctrlKey) {
+    static offset(el) {
+        const rect = el.getBoundingClientRect(),
+            scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+            scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+    }
+
+    startSelection(rowId, ctrlKey, el) {
         this.setState((state) => {
             if (!ctrlKey) {
                 state.selected = {}
                 state.startSelection = {}
             } else {
-                state.startSelection = EditableTable.cloneHash(state.selected)
+                state.startSelection = EditableTable.cloneSelection(state.selected)
             }
             state.selectEnable = !state.selected[rowId]
             state.selected[rowId] = state.selectEnable
             state.selectionStart = rowId
+            state.startElOffset = EditableTable.offset(el)
             return state
         })
     }
@@ -68,22 +76,29 @@ class EditableTable extends Component {
             return
         }
         this.setState((state) => {
-            state.selected = EditableTable.cloneHash(state.startSelection)
+            state.selected = EditableTable.cloneSelection(state.startSelection)
             this.selectionRange(state.selectionStart, rowId, state.selected, state.selectEnable)
             return state
         })
     }
 
-    endSelection(rowId) {
+    endSelection(rowId, el) {
         if (!this.state.selectionStart) {
             return
         }
         this.setState((state) => {
-            state.selected = EditableTable.cloneHash(state.startSelection)
+            state.selected = EditableTable.cloneSelection(state.startSelection)
             this.selectionRange(state.selectionStart, rowId, state.selected, state.selectEnable)
+            state.selected = EditableTable.cloneSelection(state.selected)
             state.selectionStart = undefined
+
+            if (this.props['onSelectionChanged']) {
+                let pos = {el1: this.state.startElOffset, el2: EditableTable.offset(el)};
+                this.props.onSelectionChanged(pos, state.selected)
+            }
             return state
         })
+
     }
 
     selectionRange(rowId1, rowId2, selection, enable) {
@@ -117,9 +132,9 @@ class EditableTable extends Component {
             trAttributes.className = "selected"
         }
         if (this.props.multiline) {
-            trAttributes['onMouseDown'] = (e) => this.startSelection(row.id, e.ctrlKey)
+            trAttributes['onMouseDown'] = (e) => this.startSelection(row.id, e.ctrlKey, e.target)
             trAttributes['onMouseOver'] = (e) => this.dragSelection(row.id)
-            trAttributes['onMouseUp'] = (e) => this.endSelection(row.id)
+            trAttributes['onMouseUp'] = (e) => this.endSelection(row.id, e.target)
         } else {
             trAttributes['onClick'] = (e) => this.selectRow(row.id)
         }
@@ -181,10 +196,12 @@ class EditableTable extends Component {
         }
     }
 
-    static cloneHash(obj) {
+    static cloneSelection(obj) {
         const result = {};
         for (const i in obj) {
-            result[i] = obj[i];
+            if (obj[i]) {
+                result[i] = obj[i];
+            }
         }
         return result;
     }

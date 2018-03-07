@@ -3,6 +3,7 @@ import './App.css';
 import EditableTable from "./EditableTable";
 import ScrollableLoader from "./ScrollableLoader";
 import initialData from "./initialData"
+import Popup from "./Popup";
 
 class App extends Component {
     constructor(props) {
@@ -12,6 +13,7 @@ class App extends Component {
         this.editRow = this.editRow.bind(this)
         this.sortChanged = this.sortChanged.bind(this)
         this.filterChanged = this.filterChanged.bind(this)
+        this.selectionChanged = this.selectionChanged.bind(this)
 
         this.state = {
             initialData: initialData,
@@ -22,7 +24,9 @@ class App extends Component {
                     sortField: undefined,
                     sortDirection: 'none'
                 }
-            }
+            },
+            editPopup: undefined,
+            selection: {}
         }
     }
 
@@ -100,17 +104,52 @@ class App extends Component {
         })
     }
 
+    selectionChanged(pos, selection) {
+        const el1 = pos.el1, el2 = pos.el2
+        this.setState((state) => {
+            if (Object.keys(selection).length === 0) {
+                state.editPopup = undefined
+            } else {
+                state.editPopup = {
+                    top: (el1.top + el2.top) / 2,
+                    left: (el1.left + el2.left) / 2,
+                }
+            }
+            state.selection = selection
+            return state
+        })
+    }
+
     render() {
         return (
             <div className="App" style={{display: "flex", flexDirection: "column", height: "100%"}}>
-                <input type="text" placeholder="Search" value={this.state.qParams.filter} onChange={this.filterChanged}/>
+                <Popup coords={this.state.editPopup}>
+                    <div style={{display: "flex", flexDirection: "column"}}>
+                        <div style={{display: "flex", flexDirection: "row"}}>
+                            <label>
+                                Included: <input type="checkbox"/>
+                            </label>
+                            <label>
+                                Note: <input type="text"/>
+                            </label>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "row"}}>
+                            <div style={{flex: 100}} />
+                            <button className="btn">Set</button>
+                        </div>
+                    </div>
+                </Popup>
+                <input type="text" placeholder="Search" value={this.state.qParams.filter}
+                       onChange={this.filterChanged}/>
                 <ScrollableLoader loadData={this.loadData} dataKey={this.state.qParams}>
                     <EditableTable multiline={true} header={[
                         {name: "Included", field: "included", edit: "checkbox"},
                         {name: "Name", field: "name"},
                         {name: "Size", field: "size", view: App.mapSize},
                         {name: "Note", field: "note", edit: "text"},
-                    ]} onSortChanged={this.sortChanged} onEditRow={this.editRow}/>
+                    ]} onSortChanged={this.sortChanged}
+                                   onEditRow={this.editRow}
+                                   onSelectionChanged={this.selectionChanged}/>
                 </ScrollableLoader>
             </div>
         );

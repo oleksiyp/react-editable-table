@@ -50,3 +50,25 @@ table tbody {
     cursor: cell;
     user-select: none;
 }
+
+.popup {
+    background-color: white;
+    border: 1px solid blueviolet;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.popup label {
+    margin: 5px;
+}
+
+.btn {
+    background-color: #72d137;
+    border: 2px solid #72d137;
+    border-radius: 8px;
+    margin: 10px 0;
+    padding: 4px 8px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px cadetblue;
+}
