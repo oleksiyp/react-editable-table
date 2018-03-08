@@ -3,7 +3,9 @@ import './App.css';
 import EditableTable from "./EditableTable";
 import ScrollableLoader from "./ScrollableLoader";
 import initialData from "./initialData"
+import trees from "./trees"
 import Popup from "./Popup";
+import Tree from "./Tree"
 import RowEditPanel from "./RowEditPanel";
 
 class App extends Component {
@@ -27,7 +29,7 @@ class App extends Component {
                 }
             },
             editPopup: undefined,
-            selection: {}
+            editSelection: {}
         }
     }
 
@@ -108,7 +110,7 @@ class App extends Component {
     selectionChanged(pos, selection) {
         const el1 = pos.el1, el2 = pos.el2
         this.setState((state) => {
-            if (Object.keys(selection).length === 0) {
+            if (Object.keys(selection).length <= 1) {
                 state.editPopup = undefined
             } else {
                 state.editPopup = {
@@ -141,24 +143,46 @@ class App extends Component {
 
     render() {
         return (
-            <div className="App" style={{display: "flex", flexDirection: "column", height: "100%"}}>
-                <Popup coords={this.state.editPopup}>
-                    <RowEditPanel onSet={this.editRows.bind(this)} onCancel={this.closePopup.bind(this)} />
-                </Popup>
-                <input type="text" placeholder="Search" value={this.state.qParams.filter}
-                       onChange={this.filterChanged}/>
-                <ScrollableLoader loadData={this.loadData} dataKey={this.state.qParams}>
-                    <EditableTable multiline={true} header={[
-                        {name: "Included", field: "included", edit: "checkbox"},
-                        {name: "Name", field: "name"},
-                        {name: "Size", field: "size", view: App.mapSize},
-                        {name: "Note", field: "note", edit: "text"},
-                    ]} onSortChanged={this.sortChanged}
-                                   onEditRow={this.editRow}
-                                   onSelectionChanged={this.selectionChanged}/>
-                </ScrollableLoader>
+            <div className="App" style={{display: "flex", flexDirection: "row", height: "100%"}}>
+                <div style={{display: "flex", flexDirection: "column", height: "100%", flex: 1}}>
+                    <Popup coords={this.state.editPopup}>
+                        <RowEditPanel onSet={this.editRows.bind(this)} onCancel={this.closePopup.bind(this)}/>
+                    </Popup>
+                    <input type="text" placeholder="Search" value={this.state.qParams.filter}
+                           onChange={this.filterChanged}/>
+                    <ScrollableLoader loadData={this.loadData} dataKey={this.state.qParams}>
+                        <EditableTable multiline={true} header={[
+                            {name: "Included", field: "included", edit: "checkbox"},
+                            {name: "Name", field: "name"},
+                            {name: "Size", field: "size", view: App.mapSize},
+                            {name: "Note", field: "note", edit: "text"},
+                        ]} onSortChanged={this.sortChanged}
+                                       onEditRow={this.editRow}
+                                       onSelectionChanged={this.selectionChanged}/>
+                    </ScrollableLoader>
+                </div>
+                {Object.keys(this.state.editSelection).length === 1 ? this.renderSidebar() : ""}
             </div>
         );
+    }
+
+    selectedItem() {
+        const data = this.state.data
+        const selection = this.state.editSelection
+        for (const idx2 in selection) {
+            for (const idx in data) {
+                if (data[idx].id === idx2) {
+                    return data[idx]
+                }
+            }
+        }
+        return undefined
+    }
+
+    renderSidebar() {
+        return <div className="sidebar" style={{flex: 1, display: "flex", flexDirection: "row"}}>
+            <Tree tree={trees[this.selectedItem().name]} />
+        </div>;
     }
 
     static applyEdit(data, id, field, newValue) {

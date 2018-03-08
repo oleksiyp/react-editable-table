@@ -1,5 +1,4 @@
 .App {
-    text-align: center;
 }
 
 .App-logo {
@@ -36,7 +35,11 @@ tr:hover {
     color: white
 }
 
-table tbody tr.selected {
+table td {
+    text-align: center;
+}
+
+.selected {
     background-color: rgba(148, 0, 211, 0.24);
     color: white
 
@@ -78,4 +81,20 @@ table tbody {
     color: white;
     background-color: darkviolet;
     border: 2px solid darkviolet;
+}
+
+.tree {
+    cursor: cell;
+    user-select: none;
+    padding: 0 10px;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.tree div {
+    padding: 5px;
+}
+.tree div:hover {
+    background-color: darkviolet !important;
+    color: white;
 }
