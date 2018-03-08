@@ -66,9 +66,16 @@ table tbody {
     background-color: #72d137;
     border: 2px solid #72d137;
     border-radius: 8px;
-    margin: 10px 0;
+    margin: 5px 0 5px 10px;
     padding: 4px 8px;
     color: white;
     font-weight: bold;
     text-shadow: 1px 1px 1px cadetblue;
+}
+
+
+.btnPrimary {
+    color: white;
+    background-color: darkviolet;
+    border: 2px solid darkviolet;
 }

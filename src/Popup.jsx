@@ -7,10 +7,9 @@ class Popup extends Component {
             return ""
         }
 
-        const c = {top: Math.max(coords.top - 30, 0), left: Math.max(coords.left - 100, 0)}
 
         return (
-            <div className="popup" style={{position: "absolute", top: c.top, left: c.left}}>
+            <div className="popup" style={{position: "absolute", top: coords.top, left: coords.left}}>
                 {this.props.children}
             </div>
         )

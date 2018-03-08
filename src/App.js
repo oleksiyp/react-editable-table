@@ -4,6 +4,7 @@ import EditableTable from "./EditableTable";
 import ScrollableLoader from "./ScrollableLoader";
 import initialData from "./initialData"
 import Popup from "./Popup";
+import RowEditPanel from "./RowEditPanel";
 
 class App extends Component {
     constructor(props) {
@@ -111,11 +112,29 @@ class App extends Component {
                 state.editPopup = undefined
             } else {
                 state.editPopup = {
-                    top: (el1.top + el2.top) / 2,
-                    left: (el1.left + el2.left) / 2,
+                    top: Math.max((el1.top + el2.top) / 2 - 30, 0),
+                    left: Math.max((el1.left + el2.left) / 2 - 100, 0),
                 }
             }
-            state.selection = selection
+            state.editSelection = selection
+            return state
+        })
+    }
+
+    editRows(fields) {
+        this.setState((oldState) => {
+            oldState.data = App.applyEdits(oldState.data, oldState.editSelection, "included", fields.included)
+            oldState.initialData = App.applyEdits(oldState.data, oldState.editSelection, "included", fields.included)
+            oldState.data = App.applyEdits(oldState.data, oldState.editSelection, "note", fields.note)
+            oldState.initialData = App.applyEdits(oldState.data, oldState.editSelection, "note", fields.note)
+            oldState.editPopup = undefined
+            return oldState
+        })
+    }
+
+    closePopup() {
+        this.setState((state) => {
+            state.editPopup = undefined
             return state
         })
     }
@@ -124,20 +143,7 @@ class App extends Component {
         return (
             <div className="App" style={{display: "flex", flexDirection: "column", height: "100%"}}>
                 <Popup coords={this.state.editPopup}>
-                    <div style={{display: "flex", flexDirection: "column"}}>
-                        <div style={{display: "flex", flexDirection: "row"}}>
-                            <label>
-                                Included: <input type="checkbox"/>
-                            </label>
-                            <label>
-                                Note: <input type="text"/>
-                            </label>
-                        </div>
-                        <div style={{display: "flex", flexDirection: "row"}}>
-                            <div style={{flex: 100}} />
-                            <button className="btn">Set</button>
-                        </div>
-                    </div>
+                    <RowEditPanel onSet={this.editRows.bind(this)} onCancel={this.closePopup.bind(this)} />
                 </Popup>
                 <input type="text" placeholder="Search" value={this.state.qParams.filter}
                        onChange={this.filterChanged}/>
@@ -158,6 +164,15 @@ class App extends Component {
     static applyEdit(data, id, field, newValue) {
         for (const idx in data) {
             if (data[idx].id === id) {
+                data[idx][field] = newValue
+            }
+        }
+        return data
+    }
+
+    static applyEdits(data, ids, field, newValue) {
+        for (const idx in data) {
+            if (ids[data[idx].id]) {
                 data[idx][field] = newValue
             }
         }
